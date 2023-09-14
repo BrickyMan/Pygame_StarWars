@@ -17,4 +17,6 @@ player = Player(
 	shoot_cd = FPS // 4)
 
 # Надписи
-lose_text = Label('gAme oveR', 100, WIDTH // 2, HEIGHT // 2)
+lose_text = Label(WIDTH // 2, HEIGHT // 2, 'gAme oveR', 100, YELLOW)
+
+main_menu = Menu()

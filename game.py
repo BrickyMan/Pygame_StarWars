@@ -1,45 +1,47 @@
 # Библиотеки
 import pygame
 import random
+import sys
 # Собственные модули
-from core.window import *
+from core.base import *
 from core.sprites_manager import *
 from core.classes import *
 from core.sounds import *
 from utils.constants import * 
 
-# Режим разработчика
-developer_mode = True
-
-# Инициализация часов
-clock = pygame.time.Clock()
-
-# ==== УПРАВЛЯЮЩИЕ ПЕРЕМЕННЫЕ ====
 game = GameControl()
 
 # Игровой цикл
 while game.run:
-	for event in pygame.event.get():
+	keys = pygame.key.get_pressed()
+	events = pygame.event.get()
+	for event in events:
+		# Закрытие окна
 		if event.type == pygame.QUIT:
-			game.run = False
+			pygame.quit()
+			sys.exit()
 		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_RETURN and not game.game_over:
-				paused = not paused
-			elif event.key == pygame.K_RETURN and game.paused and game.game_over:
-				game.game_over = False
-				game.paused = False
+			# if event.key == pygame.K_RETURN and :
+			# 	game.paused = not game.spaused
+			# elif event.key == pygame.K_RETURN and game.paused and game.game_over:
+			# 	game.game_over = False
+			# 	game.paused = False
+			if event.key == pygame.K_l:
+				game.set_state('game_over')
 
-	if not game.paused:
+	if game.state == 'runs':
 		# Отрисовка
 		window.fill(BLACK)
 
 		# Обновление
-		player.update()
+		player.update(keys)
 		player_lasers.update()
 		game.spawn_enemy()
 		enemies.update()
 		if pygame.sprite.spritecollideany(player, enemies):
-			game.defeat()
+			# game.defeat()
+			game.set_state('game_over')
+
 
 		shot_enemies = pygame.sprite.groupcollide(enemies, player_lasers, False, True)
 		for e in shot_enemies:
@@ -48,18 +50,23 @@ while game.run:
 				e.kill()
 
 		# Отрисовка
-		player.draw()
+		player.draw(window)
 		player_lasers.draw(window)
 		enemies.draw(window)
 
+	# Главное меню
+	elif game.state == 'menu':
+		main_menu.update(events)
+		main_menu.draw(window)
+
 	# Экран проигрыша
-	if game.paused and game.game_over:
+	elif game.state == 'game_over':
 		window.fill(BLACK)
-		lose_text.draw()
+		lose_text.draw(window)
 
 	# Последние изменения
 	pygame.display.flip()
-	clock.tick(FPS)
+	game.clock.tick(FPS)
 
 # Завершение Pygame
 pygame.quit()
